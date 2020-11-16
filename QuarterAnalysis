@@ -1,0 +1,63 @@
+library(shiny)
+library(ggplot2)
+ui <- fluidPage(
+ titlePanel("Weekly (2017)"),
+ sidebarLayout(
+ sidebarPanel(
+ numericInput(inputId = "sourceid",
+ label = "Source ID:",
+ value = 89),
+ numericInput(inputId = "destid",
+ label = "Destination ID:",
+ value = 21),
+ actionButton("update", "Update")
+ ),
+ mainPanel(
+ plotOutput(outputId = "plot1")
+ )
+ )
+)
+server <- function(input, output) {
+ observeEvent( input$update,{
+ m1 <- read.csv("C:/Users/Sruthi Shiva/Desktop/DV/2017 weekly/bangalore-wards-2017-
+1-WeeklyAggregate.csv",header=T)
+ m1["con"] <- NA
+ m1$con <- ifelse(m1$sourceid==input$sourceid & m1$dstid==input$destid, 1,0)
+ arr=m1[m1$con == 1, c("dow","mean_travel_time")]
+ arr=arr[order( arr[,1] ),]
+ arr$mean_travel_time=arr$mean_travel_time/60
+ m2 <- read.csv("C:/Users/Sruthi Shiva/Desktop/DV/2017 weekly/bangalore-wards-2017-
+2-WeeklyAggregate.csv",header=T)
+ m2["con"] <- NA
+ m2$con <- ifelse(m2$sourceid==input$sourceid & m2$dstid==input$destid, 1,0)
+ ar1=m2[m2$con == 1, c("dow","mean_travel_time")]
+ ar1=ar1[order( ar1[,1] ),]
+ ar1$mean_travel_time=ar1$mean_travel_time/60
+ m2 <- read.csv("C:/Users/Sruthi Shiva/Desktop/DV/2017 weekly/bangalore-wards-2017-
+3-WeeklyAggregate.csv",header=T)
+ m2["con"] <- NA
+ m2$con <- ifelse(m2$sourceid==input$sourceid & m2$dstid==input$destid, 1,0)
+ ar2=m2[m2$con == 1, c("dow","mean_travel_time")]
+ ar2=ar2[order( ar2[,1] ),]
+ ar2$mean_travel_time=ar2$mean_travel_time/60
+ m2 <- read.csv("C:/Users/Sruthi Shiva/Desktop/DV/2017 weekly/bangalore-wards-2017-
+4-WeeklyAggregate.csv",header=T)
+ m2["con"] <- NA
+ m2$con <- ifelse(m2$sourceid==input$sourceid & m2$dstid==input$destid, 1,0)
+ ar3=m2[m2$con == 1, c("dow","mean_travel_time")]
+ ar3=ar3[order( ar3[,1] ),]
+ ar3$mean_travel_time=ar3$mean_travel_time/60
+ output$plot1 <- renderPlot({
+ ggplot() +
+ geom_line(data=arr, aes(x=dow, y=mean_travel_time,color="blue"))+
+ geom_line(data=ar1, aes(x=dow, y=mean_travel_time,color="red"))+
+ geom_line(data=ar2, aes(x=dow, y=mean_travel_time,color="green"))+
+ geom_line(data=ar3, aes(x=dow, y=mean_travel_time,color="orange"))+
+ scale_x_discrete(limits=c("Sun","Mon","Tue","Wed","Thrus","Fri","Sat"))+
+ theme_bw()+ scale_color_discrete(name = "", labels = c("Quater 1", "Quater 2","Quater
+3", "Quater 4"))
+ }
+ )
+ })
+}
+shinyApp(ui, server)
