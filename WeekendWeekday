@@ -1,0 +1,98 @@
+library(shiny)
+library(ggplot2)
+ui <- fluidPage(
+ titlePanel("Weekday vs Weekend (2017)"),
+ sidebarLayout(
+ sidebarPanel(
+ numericInput(inputId = "sourceid",
+ label = "Source ID:",
+ value = 89),
+ numericInput(inputId = "destid",
+ label = "Destination ID:",
+ value = 21),
+ actionButton("update", "Update")
+ ),
+ mainPanel(
+ plotOutput(outputId = "plot1")
+ )
+ )
+)
+server <- function(input, output) {
+
+ observeEvent( input$update,{
+ m1 <- read.csv("C:/Users/Sruthi Shiva/Desktop/DV/2017 monthly weekend/bangalorewards-2017-1-OnlyWeekends-MonthlyAggregate.csv",header=T)
+ m1["con"] <- NA
+ m1$con <- ifelse(m1$sourceid==input$sourceid & m1$dstid==input$destid, 1,0)
+ arr=m1[m1$con == 1, c("month","mean_travel_time")]
+ arr=arr[order( arr[,1] ),]
+ arr$mean_travel_time=arr$mean_travel_time/60
+
+ m2 <- read.csv("C:/Users/Sruthi Shiva/Desktop/DV/2017 monthly weekend/bangalorewards-2017-2-OnlyWeekends-MonthlyAggregate.csv",header=T)
+ m2["con"] <- NA
+ m2$con <- ifelse(m2$sourceid==input$sourceid & m2$dstid==input$destid, 1,0)
+ arr1=m2[m2$con == 1, c("month","mean_travel_time")]
+ arr1=arr1[order( arr1[,1] ),]
+ arr1$mean_travel_time=arr1$mean_travel_time/60
+ arr=rbind(arr,arr1)
+
+ m3 <- read.csv("C:/Users/Sruthi Shiva/Desktop/DV/2017 monthly weekend/bangalorewards-2017-3-OnlyWeekends-MonthlyAggregate.csv",header=T)
+ m3["con"] <- NA
+ m3$con <- ifelse(m3$sourceid==input$sourceid & m3$dstid==input$destid, 1,0)
+ arr2=m3[m3$con == 1, c("month","mean_travel_time")]
+ arr2=arr2[order( arr2[,1] ),]
+ arr2$mean_travel_time=arr2$mean_travel_time/60
+ arr=rbind(arr,arr2)
+
+ m4 <- read.csv("C:/Users/Sruthi Shiva/Desktop/DV/2017 monthly weekend/bangalorewards-2017-4-OnlyWeekends-MonthlyAggregate.csv",header=T)
+ m4["con"] <- NA
+ m4$con <- ifelse(m4$sourceid==input$sourceid & m4$dstid==input$destid, 1,0)
+ arr3=m4[m4$con == 1, c("month","mean_travel_time")]
+ arr3=arr3[order( arr3[,1] ),]
+ arr3$mean_travel_time=arr3$mean_travel_time/60
+ arr=rbind(arr,arr3)
+ 
+ mm1 <- read.csv("C:/Users/Sruthi Shiva/Desktop/DV/2017 monthly weekday/bangalorewards-2017-1-OnlyWeekdays-MonthlyAggregate.csv",header=T)
+ mm1["con"] <- NA
+ mm1$con <- ifelse(mm1$sourceid==input$sourceid & mm1$dstid==input$destid, 1,0)
+ ar=mm1[mm1$con == 1, c("month","mean_travel_time")]
+ ar=ar[order( ar[,1] ),]
+ ar$mean_travel_time=ar$mean_travel_time/60
+
+ mm2 <- read.csv("C:/Users/Sruthi Shiva/Desktop/DV/2017 monthly weekday/bangalorewards-2017-2-OnlyWeekdays-MonthlyAggregate.csv",header=T)
+ mm2["con"] <- NA
+ mm2$con <- ifelse(mm2$sourceid==input$sourceid & mm2$dstid==input$destid, 1,0)
+ ar1=mm2[mm2$con == 1, c("month","mean_travel_time")]
+ ar1=ar1[order( ar1[,1] ),]
+ ar1$mean_travel_time=ar1$mean_travel_time/60
+ ar=rbind(ar,ar1)
+
+ mm3 <- read.csv("C:/Users/Sruthi Shiva/Desktop/DV/2017 monthly weekday/bangalorewards-2017-3-OnlyWeekdays-MonthlyAggregate.csv",header=T)
+ mm3["con"] <- NA
+ mm3$con <- ifelse(mm3$sourceid==input$sourceid & mm3$dstid==input$destid, 1,0)
+ ar2=mm3[mm3$con == 1, c("month","mean_travel_time")]
+ ar2=ar2[order( ar2[,1] ),]
+ ar2$mean_travel_time=ar2$mean_travel_time/60
+ ar=rbind(ar,ar2)
+
+ mm4 <- read.csv("C:/Users/Sruthi Shiva/Desktop/DV/2017 monthly weekday/bangalorewards-2017-4-OnlyWeekdays-MonthlyAggregate.csv",header=T)
+ mm4["con"] <- NA
+ mm4$con <- ifelse(mm4$sourceid==input$sourceid & mm4$dstid==input$destid, 1,0)
+ ar3=mm4[mm4$con == 1, c("month","mean_travel_time")]
+ ar3=ar3[order( ar3[,1] ),]
+ ar3$mean_travel_time=ar3$mean_travel_time/60
+ ar=rbind(ar,ar3)
+ output$plot1 <- renderPlot({
+ ggplot() +
+ geom_line(data=ar, aes(x=month, y=mean_travel_time,color="red"))+
+ geom_line(data=arr, aes(x=month, y=mean_travel_time,color="blue"))+
+
+scale_x_discrete(limits=c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","N
+ov","Dec"))+
+ theme_bw()+
+ scale_color_discrete(name = "Week", labels = c("Weekday", "Weekend"))
+ }
+ )
+ })
+
+}
+shinyApp(ui, server)
